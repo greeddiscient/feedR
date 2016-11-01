@@ -73,6 +73,7 @@ let musicStatusOn = new Container({
     active: true,
   	behavior: Behavior ({
   		onTouchEnded: function(content, id, x, y, ticks) {
+        remotePins.invoke("/ledmusic/write", 0);
         application.remove(musicStatusOn)
         application.add(musicStatusOff);
   		}
@@ -86,6 +87,8 @@ let musicStatusOff = new Container({
     active: true,
   	behavior: Behavior ({
   		onTouchEnded: function(content, id, x, y, ticks) {
+        remotePins.invoke("/ledmusic/write", 1);
+
         application.remove(musicStatusOff)
         application.add(musicStatusOn);
   		}
@@ -152,7 +155,7 @@ let digestingContainer = new Container({
   contents:[ new Column({contents:[new Label({
     string: "Digesting:", style: new Style({font: '22px', color: 'white'}),
   }),new Label({
-    string: "10.07", style: new Style({font: '22px', color: 'white'}),
+    string: "17%", style: new Style({font: '22px', color: 'white'}),
   })]})],
 });
 application.add(splashScreen);
@@ -188,6 +191,17 @@ class AppBehavior extends Behavior {
             },
 
         );
-			}
+        remotePins.invoke("/sensorweight/read", function(result) {
+  		    		trace("the led 's value is "+result+"\n");
+              if (result==0){
+                remotePins.invoke("/ledmusic/write", 1);
+              }
+              else{
+                remotePins.invoke("/ledmusic/write", 0);
+              }
+
+
+  			});
+	}
 }
 application.behavior = new AppBehavior();

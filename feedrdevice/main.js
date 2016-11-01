@@ -60,7 +60,7 @@ let sensorButton = new Container({
 	active: true,
 	behavior: Behavior ({
 		onTouchEnded: function(content, id, x, y, ticks) {
-			Pins.invoke("/sensor/read", function(result) {
+			Pins.invoke("/sensorweight/read", function(result) {
 		    		trace("the sensor 's value is "+result+"\n");
             //the code in line 43 is how you can change the value on the actual device.
 //since we don't use the actual hardware in this programming3, whether or not to
@@ -69,13 +69,13 @@ let sensorButton = new Container({
 
 			});
       // Pins.invoke("/sensor/write", 0);
-      Pins.invoke("/led/read", function(result) {
+      Pins.invoke("/ledmusic/read", function(result) {
 		    		trace("the sensor 's value is "+result+"\n");
             if (result==0){
-              Pins.invoke("/led/write", 1);
+              Pins.invoke("/ledmusic/write", 1);
             }
             else{
-              Pins.invoke("/led/write", 0);
+              Pins.invoke("/ledmusic/write", 0);
             }
 
 
