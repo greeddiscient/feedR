@@ -88,8 +88,33 @@ let splashScreen = new Column({
 	name: 'splashScreen',
 	left: 0, right: 0, top: 0, bottom: 0, skin: orangeSkin,
 	contents: [
-		sensorButton
 	]
 });
 
+Handler.bind("/dispensingFood", Behavior({
+    onInvoke: function(handler, message){
+      let weightContainer = new Container({
+        right:200, left:0, top:175,bottom:0, skin:blueSkin,
+        contents:[new Label({
+          string: "Dispensing Food", style: new Style({font: '22px', color: 'white'}),
+        })]
+      });
+
+        // return JSON data to the invoker to indicate the current count
+        application.add(weightContainer);
+        message.status = 200;
+    }
+}));
+
+
 application.add(splashScreen);
+class ApplicationBehavior extends Behavior {
+    onLaunch(application) {
+        application.shared = true;
+    }
+    onQuit(application) {
+        application.shared = false;
+    }
+}
+
+application.behavior = new ApplicationBehavior();

@@ -1,5 +1,5 @@
 let Pins = require("pins");
-
+var deviceURL = "";
 let whiteSkin = new Skin({ fill: 'white' });
 let redSkin = new Skin({ fill: 'red' });
 let orangeSkin = new Skin({ fill: 'orange' });
@@ -101,7 +101,20 @@ let feedContainer = new Container({
   left:220, right:0, top:0,bottom:145, skin:greenSkin
 });
 let meatPicture = new Picture({
-	height: 50, width:50, left:220, bottom:150, url: "assets/meat.png", aspect: "fill"
+	height: 50, width:50, left:220, bottom:150, url: "assets/meat.png", aspect: "fill",
+	active: true,
+  behavior: Behavior ({
+    onTouchEnded: function(content, id, x, y, ticks) {
+      trace("food"+"\n")
+			trace(deviceURL+"\n")
+
+			if (deviceURL != "") new Message(deviceURL + "dispensingFood").invoke(Message.JSON).then(json => { });
+
+
+
+    }
+  })
+
 })
 let drinkPicture = new Picture({
 	height: 50, width:50, left:275, bottom:150, url: "assets/water.png", aspect: "fill"
@@ -136,6 +149,11 @@ let toiletContainer = new Container({
 
 
 			});
+
+			if (deviceURL != "") new Message(deviceURL + "displayingFood").invoke(Message.JSON).then(json => {  });
+
+
+
     }
   })
 
@@ -172,10 +190,23 @@ application.add(digestingContainer);
 application.add(weightContainer);
 
 
+Handler.bind("/discover", Behavior({
+  onInvoke: function(handler, message){
+      deviceURL = JSON.parse(message.requestText).url;
+  }
+}));
+
+Handler.bind("/forget", Behavior({
+    onInvoke: function(handler, message){
+        deviceURL = "";
+    }
+}));
+
 let remotePins;
 class AppBehavior extends Behavior {
     onLaunch(application) {
         trace("menatap"+"\n");
+				application.discover("feedrdevice");
 				let discoveryInstance = Pins.discover(
             connectionDesc => {
                 if (connectionDesc.name == "pins-share-led") {
@@ -191,17 +222,28 @@ class AppBehavior extends Behavior {
             },
 
         );
-        remotePins.invoke("/sensorweight/read", function(result) {
-  		    		trace("the led 's value is "+result+"\n");
-              if (result==0){
-                remotePins.invoke("/ledmusic/write", 1);
-              }
-              else{
-                remotePins.invoke("/ledmusic/write", 0);
-              }
-
-
-  			});
+        // remotePins.invoke("/sensorweight/read", function(result) {
+  		  //   		trace("the led 's value is "+result+"\n");
+        //       if (result==0){
+        //         remotePins.invoke("/ledmusic/write", 1);
+        //       }
+        //       else{
+        //         remotePins.invoke("/ledmusic/write", 0);
+        //       }
+				//
+				//
+  			// });
 	}
+	onQuit(application){
+		application.forget("feedrdevice");
+	}
+  // onDisplayed: function(application) {
+  //       application.discover("my-device");
+  //   }
+  //   onQuit: function(application) {
+  //       // implement the /forget handler to be notified and to delete
+  //       // our stored URL when device apps disappear
+  //       application.forget("my-device");
+  //   }
 }
 application.behavior = new AppBehavior();
