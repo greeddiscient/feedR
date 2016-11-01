@@ -117,7 +117,19 @@ let meatPicture = new Picture({
 
 })
 let drinkPicture = new Picture({
-	height: 50, width:50, left:275, bottom:150, url: "assets/water.png", aspect: "fill"
+	height: 50, width:50, left:275, bottom:150, url: "assets/water.png", aspect: "fill",
+	active: true,
+  behavior: Behavior ({
+    onTouchEnded: function(content, id, x, y, ticks) {
+      trace("water"+"\n")
+			trace(deviceURL+"\n")
+
+			if (deviceURL != "") new Message(deviceURL + "dispensingWater").invoke(Message.JSON).then(json => { });
+
+
+
+    }
+  })
 })
 let dogPicture = new Picture({
 	height: 125, width:125, url: "assets/dog.png", aspect: "fill"
@@ -158,23 +170,59 @@ let toiletContainer = new Container({
   })
 
 });
+var weightLabel=new Label({
+	string: "20.3", style: new Style({font: '22px', color: 'white'}),
+})
 let weightContainer = new Container({
   right:200, left:0, top:175,bottom:0, skin:blueSkin,
   contents:[new Line({contents:[new Picture({
   	height: 50, width:50, url: "assets/weights.png", aspect: "fill"
   }), new Column({contents:[new Label({
     string: "Weight:", style: new Style({font: '22px', color: 'white'}),
-  }),new Label({
-    string: "20.3", style: new Style({font: '22px', color: 'white'}),
-  })]})]})],
+  }),weightLabel]})]})],
+	active: true,
+  behavior: Behavior ({
+    onTouchEnded: function(content, id, x, y, ticks) {
+      trace("updating weight"+"\n")
+      remotePins.invoke("/sensorweight/read", function(result) {
+		    		trace("the led 's value is "+result+"\n");
+            digestLabel.string = result*100 + "kg";
+
+
+			});
+
+			if (deviceURL != "") new Message(deviceURL + "displayingFood").invoke(Message.JSON).then(json => {  });
+
+
+
+    }
+  })
 });
+var digestLabel=new Label({
+	string: "17%", style: new Style({font: '22px', color: 'white'}),
+})
 let digestingContainer = new Container({
   right:110, left:120, top:175,bottom:0, skin:orangeSkin,
   contents:[ new Column({contents:[new Label({
     string: "Digesting:", style: new Style({font: '22px', color: 'white'}),
-  }),new Label({
-    string: "17%", style: new Style({font: '22px', color: 'white'}),
-  })]})],
+  }),digestLabel]})],
+	active: true,
+  behavior: Behavior ({
+    onTouchEnded: function(content, id, x, y, ticks) {
+      trace("updating digestion"+"\n")
+      remotePins.invoke("/sensor/read", function(result) {
+		    		trace("the led 's value is "+result+"\n");
+            digestLabel.string = result*100 + "%";
+
+
+			});
+
+			if (deviceURL != "") new Message(deviceURL + "displayingFood").invoke(Message.JSON).then(json => {  });
+
+
+
+    }
+  })
 });
 application.add(splashScreen);
 application.add(dogPicture);

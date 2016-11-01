@@ -93,15 +93,29 @@ let splashScreen = new Column({
 
 Handler.bind("/dispensingFood", Behavior({
     onInvoke: function(handler, message){
-      let weightContainer = new Container({
-        right:200, left:0, top:175,bottom:0, skin:blueSkin,
+      let displayFoodContainer = new Container({
+        right:50, left:50, top:100,bottom:100, skin:blueSkin,
         contents:[new Label({
           string: "Dispensing Food", style: new Style({font: '22px', color: 'white'}),
         })]
       });
 
         // return JSON data to the invoker to indicate the current count
-        application.add(weightContainer);
+        application.add(displayFoodContainer);
+        message.status = 200;
+    }
+}));
+Handler.bind("/dispensingWater", Behavior({
+    onInvoke: function(handler, message){
+      let displayWaterContainer = new Container({
+        right:50, left:50, top:100,bottom:100, skin:blueSkin,
+        contents:[new Label({
+          string: "Dispensing Water", style: new Style({font: '22px', color: 'white'}),
+        })]
+      });
+
+        // return JSON data to the invoker to indicate the current count
+        application.add(displayWaterContainer);
         message.status = 200;
     }
 }));
@@ -116,5 +130,13 @@ class ApplicationBehavior extends Behavior {
         application.shared = false;
     }
 }
+let feedrLabel= new Label({
+  string: "FeedR", style: new Style({font: '26px', color: 'green'}), bottom:175, top:0, left:0,right:0
+})
+let dogPicture = new Picture({
+	height: 125, width:125, url: "assets/dog.png", aspect: "fill"
+})
+application.add(dogPicture);
+application.add(feedrLabel);
 
 application.behavior = new ApplicationBehavior();
