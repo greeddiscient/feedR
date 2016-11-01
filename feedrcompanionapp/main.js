@@ -2,9 +2,11 @@ let Pins = require("pins");
 
 let whiteSkin = new Skin({ fill: 'white' });
 let redSkin = new Skin({ fill: 'red' });
+let orangeSkin = new Skin({ fill: 'orange' });
 let greenSkin = new Skin({ fill: 'green' });
 let brownSkin = new Skin({ fill: '#8B4513' });
 let blackSkin = new Skin({ fill: 'black' });
+let blueSkin = new Skin({ fill: 'blue' });
 let buttonStyle = new Style({font: '22px', color: 'white'});
 
 let sensorButton = new Container({
@@ -16,6 +18,17 @@ let sensorButton = new Container({
 	active: true,
 	behavior: Behavior ({
 		onTouchEnded: function(content, id, x, y, ticks) {
+      remotePins.invoke("/led/read", function(result) {
+		    		trace("the led 's value is "+result+"\n");
+            if (result==0){
+              remotePins.invoke("/led/write", 1);
+            }
+            else{
+              remotePins.invoke("/led/write", 0);
+            }
+
+
+			});
 		}
 	})
 });
@@ -40,6 +53,7 @@ let musicButton = new Container({
 	active: true,
 	behavior: Behavior ({
 		onTouchEnded: function(content, id, x, y, ticks) {
+
 		}
 	})
 });
@@ -108,9 +122,38 @@ let toiletContainer = new Container({
   behavior: Behavior ({
     onTouchEnded: function(content, id, x, y, ticks) {
       trace("pooping"+"\n")
+      remotePins.invoke("/ledtoilet/read", function(result) {
+		    		trace("the led 's value is "+result+"\n");
+            if (result==0){
+              remotePins.invoke("/ledtoilet/write", 1);
+            }
+            else{
+              remotePins.invoke("/ledtoilet/write", 0);
+            }
+
+
+			});
     }
   })
 
+});
+let weightContainer = new Container({
+  right:200, left:0, top:175,bottom:0, skin:blueSkin,
+  contents:[new Line({contents:[new Picture({
+  	height: 50, width:50, url: "assets/weights.png", aspect: "fill"
+  }), new Column({contents:[new Label({
+    string: "Weight:", style: new Style({font: '22px', color: 'white'}),
+  }),new Label({
+    string: "20.3", style: new Style({font: '22px', color: 'white'}),
+  })]})]})],
+});
+let digestingContainer = new Container({
+  right:110, left:120, top:175,bottom:0, skin:orangeSkin,
+  contents:[ new Column({contents:[new Label({
+    string: "Digesting:", style: new Style({font: '22px', color: 'white'}),
+  }),new Label({
+    string: "10.07", style: new Style({font: '22px', color: 'white'}),
+  })]})],
 });
 application.add(splashScreen);
 application.add(dogPicture);
@@ -122,6 +165,8 @@ application.add(musicPicture);
 application.add(musicStatusOff);
 application.add(feedrLabel);
 application.add(toiletContainer);
+application.add(digestingContainer);
+application.add(weightContainer);
 
 
 let remotePins;
